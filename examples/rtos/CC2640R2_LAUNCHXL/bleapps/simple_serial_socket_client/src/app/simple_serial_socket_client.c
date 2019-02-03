@@ -999,42 +999,28 @@ static bool SimpleSerialSocketClient_findSerialStreamServer(const uint8_t *uuid,
       if ((adType == GAP_ADTYPE_128BIT_MORE) ||
           (adType == GAP_ADTYPE_128BIT_COMPLETE))
       {
-        pData++;
-        adLen--;
-
-        // For each UUID in list
-        while (adLen >= 2 && pData < pEnd)
-        {
+          pData++;
+          adLen--;
           // Check for match
-          if (!memcmp(pData, uuid, ATT_UUID_SIZE))
+          if (memcmp(pData, uuid, ATT_UUID_SIZE) == 0)
           {
             matchingIdAndUuid++;
           }
-
-          // Go to next
-          pData += 2;
-          adLen -= 2;
-        }
-
-        // Handle possible erroneous extra byte in UUID list
-        if (adLen == 1)
-        {
-          pData++;
-        }
       }
-
-      if(adType == GAP_ADTYPE_MANUFACTURER_SPECIFIC)
+      else if(adType == GAP_ADTYPE_MANUFACTURER_SPECIFIC)
       {
+          pData++;
+          adLen--;
           // Floor to the lowest length
           uint8_t len = adLen;
           if (manDataLen < len)
           {
-              len = manDataLen;
+            len = manDataLen;
           }
 
-          if (memcmp(pManufData, pData, len))
+          if (memcmp(pData, pManufData, len) == 0)
           {
-              matchingIdAndUuid++;
+            matchingIdAndUuid++;
           }
       }
 
@@ -1054,6 +1040,7 @@ static bool SimpleSerialSocketClient_findSerialStreamServer(const uint8_t *uuid,
   // Match not found
   return FALSE;
 }
+
 
 /*********************************************************************
  * @fn      SimpleSerialSocketClient_eventCB
